@@ -4,6 +4,9 @@ WIP.
 
 * Test
 
+You will need to install libfep from:
+http://github.com/ueno/libfep
+
 Run ibus-daemon without the default panel:
 
 $ ibus-daemon -rv --panel=disable
