@@ -1,0 +1,13 @@
+ibus-fep -- FEP (front end processor) for IBus
+
+WIP.
+
+* Test
+
+Run ibus-daemon without the default panel:
+
+$ ibus-daemon -rv --panel=disable
+
+On another terminal:
+
+$ ibus-fep --engine=anthy -- /bin/sh
