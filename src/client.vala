@@ -34,7 +34,7 @@ class Client : Fep.GClient {
     void _ibus_commit_text (IBus.Text text) {
         var str = text.get_text ();
         if (str.length > 0)
-            send_data (str, str.length);
+            send_text (str);
     }
 
     void _ibus_hide_preedit_text () {
