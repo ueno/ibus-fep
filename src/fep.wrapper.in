@@ -17,26 +17,6 @@
 
 : ${FEP:=@FEP@}
 
-TEMP=`getopt -o :: --long engine:: -n 'fep.wrapper' -- "$@"`
-eval set -- "$TEMP"
-
-ENGINE=
-while true ; do
-    case "$1" in
-	--engine)
-	    ENGINE="$2"
-	    shift 2
-	    ;;
-	--)
-	    shift
-	    break
-	    ;;
-	*)
-	    exit 1
-	    ;;
-    esac
-done
-
 $FEP --engine "$ENGINE" &
 
 if test "$#" = 0; then
