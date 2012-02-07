@@ -83,13 +83,12 @@ class IBusFep {
     }
 
     bool watch_func (IOChannel source, IOCondition condition) {
-        client.dispatch_key_event ();
+        client.dispatch ();
         return true;
     }
 
     public void run () {
-        var channel = new IOChannel.unix_new (
-            client.get_key_event_poll_fd ());
+        var channel = new IOChannel.unix_new (client.get_poll_fd ());
         channel.add_watch (IOCondition.IN, watch_func);
 
         IBus.main ();
