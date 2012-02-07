@@ -38,7 +38,7 @@ fep_LDADD =					\
 	$(LIBFEP_LIBS)				\
 	$(NULL)
 
-fep_SOURCES = fep.vala main.vala
+fep_SOURCES = client.vala main.vala
 
 GITIGNOREFILES =				\
 	$(fep_SOURCES:.vala=.c)			\

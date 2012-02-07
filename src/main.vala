@@ -52,9 +52,16 @@ static int main (string[] args) {
         return 1;
     }
 
-    var fep = new IBusFep (bus);
-    fep.engine = engine;
-    fep.run ();
+    Client client;
+    try {
+        client = new Client (bus);
+    } catch (Error e) {
+        stderr.printf ("can't create client: %s\n", e.message);
+        return 1;
+    }
+    client.engine = engine;
+
+    IBus.main ();
 
     return 0;
 }
