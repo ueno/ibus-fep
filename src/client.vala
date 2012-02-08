@@ -28,6 +28,7 @@ class Client : Fep.GClient {
     }
 
     IBus.InputContext context;
+    bool enabled = false;
     IBus.LookupTable lookup_table;
     bool preedit_visible = false;
     bool lookup_table_visible = false;
@@ -68,7 +69,12 @@ class Client : Fep.GClient {
 
     void update_status () {
         var builder = new StringBuilder ();
-        builder.append ("[" + engine + "]");
+        if (enabled) {
+            var desc = context.get_engine ();
+            builder.append ("[" + desc.symbol + "]");
+        } else {
+            builder.append ("[  ]");
+        }
         if (lookup_table_visible) {
             var pages = lookup_table.cursor_pos / lookup_table.page_size;
             var start = pages * lookup_table.page_size;
@@ -77,7 +83,9 @@ class Client : Fep.GClient {
             for (var index = start; index < end; index++) {
                 var label = lookup_table.get_label (index);
                 var candidate = lookup_table.get_candidate (index);
-                builder.append (" %s: %s".printf (label == null ? (index - start + 1).to_string () : label.get_text (),
+                var label_text = label == null ?
+                    (index - start + 1).to_string () : label.get_text ();
+                builder.append (" %s:%s".printf (label_text,
                                                  candidate.get_text ()));
             }
         }
@@ -108,10 +116,23 @@ class Client : Fep.GClient {
     }
 
     void _ibus_enabled () {
+        enabled = true;
+        update_status ();
+    }
+
+    void _ibus_disabled () {
+        enabled = false;
         update_status ();
     }
 
     public override bool filter_key_event (uint keyval, uint modifiers) {
+        if (keyval == IBus.backslash &&
+            (modifiers & IBus.ModifierType.CONTROL_MASK) != 0) {
+            if (enabled)
+                context.disable ();
+            else
+                context.enable ();
+        }
         return context.process_key_event (keyval, 0, modifiers);
     }
 
@@ -133,6 +154,7 @@ class Client : Fep.GClient {
         context.hide_lookup_table.connect (_ibus_hide_lookup_table);
         context.update_lookup_table.connect (_ibus_update_lookup_table);
         context.enabled.connect (_ibus_enabled);
+        context.disabled.connect (_ibus_disabled);
 
         context.enable ();
         context.set_capabilities (IBus.Capabilite.PREEDIT_TEXT);
