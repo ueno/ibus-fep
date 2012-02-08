@@ -28,8 +28,12 @@ class Client : Fep.GClient {
     }
 
     IBus.InputContext context;
-    string preedit;
-    bool preedit_visible;
+    IBus.LookupTable lookup_table;
+    bool preedit_visible = false;
+    bool lookup_table_visible = false;
+
+    string preedit = "";
+    string status = "";
 
     void _ibus_commit_text (IBus.Text text) {
         var str = text.get_text ();
@@ -37,14 +41,14 @@ class Client : Fep.GClient {
             send_text (str);
     }
 
-    void _ibus_hide_preedit_text () {
-        set_cursor_text ("");
-        preedit_visible = false;
-    }
-
     void _ibus_show_preedit_text () {
         set_cursor_text (preedit);
         preedit_visible = true;
+    }
+
+    void _ibus_hide_preedit_text () {
+        set_cursor_text ("");
+        preedit_visible = false;
     }
 
     void _ibus_update_preedit_text (IBus.Text text,
@@ -62,8 +66,49 @@ class Client : Fep.GClient {
         }
     }
 
+    void update_status () {
+        var builder = new StringBuilder ();
+        builder.append ("[" + engine + "]");
+        if (lookup_table_visible) {
+            var pages = lookup_table.cursor_pos / lookup_table.page_size;
+            var start = pages * lookup_table.page_size;
+            var end = uint.min (start + lookup_table.page_size,
+                                lookup_table.get_number_of_candidates ());
+            for (var index = start; index < end; index++) {
+                var label = lookup_table.get_label (index);
+                var candidate = lookup_table.get_candidate (index);
+                builder.append (" %s: %s".printf (label == null ? (index - start + 1).to_string () : label.get_text (),
+                                                 candidate.get_text ()));
+            }
+        }
+        if (status != builder.str) {
+            set_status_text (builder.str);
+            status = builder.str;
+        }
+    }
+
+    void _ibus_show_lookup_table () {
+        lookup_table_visible = true;
+        update_status ();
+    }
+
+    void _ibus_hide_lookup_table () {
+        lookup_table_visible = false;
+        update_status ();
+    }
+
+    void _ibus_update_lookup_table (IBus.LookupTable lookup_table,
+                                    bool visible)
+    {
+        this.lookup_table = lookup_table;
+        if (visible)
+            _ibus_show_lookup_table ();
+        else
+            _ibus_hide_lookup_table ();
+    }
+
     void _ibus_enabled () {
-        set_status_text (engine);
+        update_status ();
     }
 
     public override bool filter_key_event (uint keyval, uint modifiers) {
@@ -81,10 +126,14 @@ class Client : Fep.GClient {
 
         context = bus.create_input_context ("ibus-fep");
         context.commit_text.connect (_ibus_commit_text);
-        context.hide_preedit_text.connect (_ibus_hide_preedit_text);
         context.show_preedit_text.connect (_ibus_show_preedit_text);
+        context.hide_preedit_text.connect (_ibus_hide_preedit_text);
         context.update_preedit_text.connect (_ibus_update_preedit_text);
+        context.show_lookup_table.connect (_ibus_show_lookup_table);
+        context.hide_lookup_table.connect (_ibus_hide_lookup_table);
+        context.update_lookup_table.connect (_ibus_update_lookup_table);
         context.enabled.connect (_ibus_enabled);
+
         context.enable ();
         context.set_capabilities (IBus.Capabilite.PREEDIT_TEXT);
 
