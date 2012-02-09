@@ -1,16 +1,38 @@
-ibus-fep -- FEP (front end processor) for IBus
+ibus-fep -- IBus client for text terminals
 
-WIP.
+Usage:
 
-* Test
+If you compile ibus-fep from source, you will need to install libfep
+from: http://github.com/ueno/libfep
 
-You will need to install libfep from:
-http://github.com/ueno/libfep
+$ ibus-daemon -rv --panel=disable &
 
-Run ibus-daemon without the default panel:
+$ ibus-fep --engine=anthy
 
-$ ibus-daemon -rv --panel=disable
+or:
 
-On another terminal:
+$ ibus-fep --engine=pinyin -- /bin/sh
 
-$ ibus-fep --engine=anthy -- /bin/sh
+To toggle IME on/off, type Control+\ (backslash).  You can customize
+the keybinding with:
+
+gconftool-2 --set /desktop/ibus/fep/toggle_shortcut --type string "Control+o"
+
+Limitations:
+
+* IMEs which expect X keycodes (ibus-hangul, etc.) cannot be used
+
+* License
+
+GPLv3+
+
+Copyright (C) 2012 Daiki Ueno <ueno@unixuser.org>
+Copyright (C) 2012 Red Hat, Inc.
+
+This file is free software; as a special exception the author gives
+unlimited permission to copy and/or distribute it, with or without
+modifications, as long as this notice is preserved.
+
+This file is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY, to the extent permitted by law; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

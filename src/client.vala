@@ -1,6 +1,6 @@
 /*
- * Copyright (C) 2011-2012 Daiki Ueno <ueno@unixuser.org>
- * Copyright (C) 2011-2012 Red Hat, Inc.
+ * Copyright (C) 2012 Daiki Ueno <ueno@unixuser.org>
+ * Copyright (C) 2012 Red Hat, Inc.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,15 +94,18 @@ class Client : Fep.GClient {
         }
         Fep.GAttribute? attr = null;
         if (lookup_table_visible) {
-            var pages = lookup_table.cursor_pos / lookup_table.page_size;
+            var pages = lookup_table.cursor_pos /
+                lookup_table.page_size;
             var start = pages * lookup_table.page_size;
-            var end = uint.min (start + lookup_table.page_size,
-                                lookup_table.get_number_of_candidates ());
+            var end = uint.min (
+                start + lookup_table.page_size,
+                lookup_table.get_number_of_candidates ());
             for (var index = start; index < end; index++) {
                 var label = lookup_table.get_label (index);
                 var candidate = lookup_table.get_candidate (index);
-                var label_text = label == null ?
-                    (index - start + 1).to_string () : label.get_text ();
+                var label_text = label != null ?
+                    label.get_text () :
+                    (index - start + 1).to_string ();
                 var text = "%s:%s".printf (label_text,
                                            candidate.get_text ());
                 if (lookup_table.is_cursor_visible () &&
@@ -157,13 +160,16 @@ class Client : Fep.GClient {
         update_status ();
     }
 
-    public override bool filter_key_event (uint keyval, uint modifiers) {
+    public override bool filter_key_event (uint keyval,
+                                           uint modifiers)
+    {
         if (keyval == toggle_keyval &&
             (modifiers & toggle_modifiers) != 0) {
             if (enabled)
                 context.disable ();
             else
                 context.enable ();
+            return true;
         }
         return context.process_key_event (keyval, 0, modifiers);
     }
@@ -198,10 +204,12 @@ class Client : Fep.GClient {
         context.commit_text.connect (_ibus_commit_text);
         context.show_preedit_text.connect (_ibus_show_preedit_text);
         context.hide_preedit_text.connect (_ibus_hide_preedit_text);
-        context.update_preedit_text.connect (_ibus_update_preedit_text);
+        context.update_preedit_text.connect (
+            _ibus_update_preedit_text);
         context.show_lookup_table.connect (_ibus_show_lookup_table);
         context.hide_lookup_table.connect (_ibus_hide_lookup_table);
-        context.update_lookup_table.connect (_ibus_update_lookup_table);
+        context.update_lookup_table.connect (
+            _ibus_update_lookup_table);
         context.enabled.connect (_ibus_enabled);
         context.disabled.connect (_ibus_disabled);
 
