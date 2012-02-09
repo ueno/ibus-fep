@@ -34,7 +34,9 @@ class Client : Fep.GClient {
     bool lookup_table_visible = false;
 
     string preedit = "";
+    Fep.GAttribute? preedit_attr;
     string status = "";
+    Fep.GAttribute? status_attr;
 
     void _ibus_commit_text (IBus.Text text) {
         var str = text.get_text ();
@@ -43,12 +45,12 @@ class Client : Fep.GClient {
     }
 
     void _ibus_show_preedit_text () {
-        set_cursor_text (preedit);
+        set_cursor_text (preedit, preedit_attr);
         preedit_visible = true;
     }
 
     void _ibus_hide_preedit_text () {
-        set_cursor_text ("");
+        set_cursor_text ("", null);
         preedit_visible = false;
     }
 
@@ -57,8 +59,23 @@ class Client : Fep.GClient {
                                     bool visible)
     {
         var _preedit = text.get_text ();
-        if (_preedit != preedit || preedit_visible != visible) {
+        var attrs = text.get_attributes ();
+        Fep.GAttribute? attr = null;
+        for (var i = 0; i < attrs.attributes.length; i++) {
+            var _attr = attrs.get (i);
+            if (_attr.type == IBus.AttrType.UNDERLINE) {
+                attr = Fep.GAttribute () {
+                    type = Fep.GAttrType.UNDERLINE,
+                    value = Fep.GAttrUnderline.SINGLE,
+                    start_index = _attr.start_index,
+                    end_index = _attr.end_index
+                };
+            }
+        }
+        if (preedit != _preedit || preedit_attr != attr ||
+            preedit_visible != visible) {
             preedit = _preedit;
+            preedit_attr = attr;
             if (visible) {
                 _ibus_show_preedit_text ();
             } else {
@@ -71,10 +88,11 @@ class Client : Fep.GClient {
         var builder = new StringBuilder ();
         if (enabled) {
             var desc = context.get_engine ();
-            builder.append ("[" + desc.symbol + "]");
+            builder.append ("[" + desc.symbol + "] ");
         } else {
-            builder.append ("[  ]");
+            builder.append ("[  ] ");
         }
+        Fep.GAttribute? attr = null;
         if (lookup_table_visible) {
             var pages = lookup_table.cursor_pos / lookup_table.page_size;
             var start = pages * lookup_table.page_size;
@@ -85,13 +103,27 @@ class Client : Fep.GClient {
                 var candidate = lookup_table.get_candidate (index);
                 var label_text = label == null ?
                     (index - start + 1).to_string () : label.get_text ();
-                builder.append (" %s:%s".printf (label_text,
-                                                 candidate.get_text ()));
+                var text = "%s:%s".printf (label_text,
+                                           candidate.get_text ());
+                if (lookup_table.is_cursor_visible () &&
+                    index == lookup_table.get_cursor_pos ()) {
+                    var start_index = builder.str.char_count ();
+                    attr = Fep.GAttribute () {
+                        type = Fep.GAttrType.STANDOUT,
+                        value = 1,
+                        start_index = start_index,
+                        end_index = start_index + text.char_count ()
+                    };
+                }
+                builder.append (text);
+                if (index < end - 1)
+                    builder.append_c (' ');
             }
         }
-        if (status != builder.str) {
-            set_status_text (builder.str);
+        if (status != builder.str || status_attr != attr) {
+            set_status_text (builder.str, attr);
             status = builder.str;
+            status_attr = attr;
         }
     }
 
