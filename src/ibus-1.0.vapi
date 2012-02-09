@@ -4709,7 +4709,7 @@ namespace IBus {
 	[CCode (cheader_filename = "ibus.h")]
 	public static void init ();
 	[CCode (cheader_filename = "ibus.h")]
-	public static bool key_event_from_string (string str, uint keyval, uint modifiers);
+	public static bool key_event_from_string (string str, out uint keyval, out uint modifiers);
 	[CCode (cheader_filename = "ibus.h")]
 	public static unowned string key_event_to_string (uint keyval, uint modifiers);
 	[CCode (cheader_filename = "ibus.h")]

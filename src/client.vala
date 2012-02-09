@@ -158,8 +158,8 @@ class Client : Fep.GClient {
     }
 
     public override bool filter_key_event (uint keyval, uint modifiers) {
-        if (keyval == IBus.backslash &&
-            (modifiers & IBus.ModifierType.CONTROL_MASK) != 0) {
+        if (keyval == toggle_keyval &&
+            (modifiers & toggle_modifiers) != 0) {
             if (enabled)
                 context.disable ();
             else
@@ -173,9 +173,26 @@ class Client : Fep.GClient {
         return true;
     }
 
+    IBus.Config config;
+
+    uint toggle_keyval = IBus.backslash;
+    uint toggle_modifiers = IBus.ModifierType.CONTROL_MASK;
+
     public Client (IBus.Bus bus) throws Error {
         Object (address: null);
         init (null);
+
+        config = bus.get_config ();
+        var values = config.get_values ("fep");
+        if (values != null) {
+            var value = values.lookup_value ("toggle_shortcut",
+                                             VariantType.STRING);
+            if (value != null) {
+                IBus.key_event_from_string (value.get_string (),
+                                            out toggle_keyval,
+                                            out toggle_modifiers);
+            }
+        }
 
         context = bus.create_input_context ("ibus-fep");
         context.commit_text.connect (_ibus_commit_text);
