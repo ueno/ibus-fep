@@ -64,4 +64,6 @@ fep.wrapper: fep.wrapper.in
 	$< > $@.tmp && \
 	mv $@.tmp $@
 
+dist_man_MANS = ibus-fep.1
+
 -include $(top_srcdir)/git.mk
