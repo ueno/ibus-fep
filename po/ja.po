@@ -1,0 +1,35 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-02-10 11:43+0900\n"
+"PO-Revision-Date: 2012-02-10 11:45+0900\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../src/main.c:79
+msgid "- IBus client for text terminals"
+msgstr "- テキスト端末用 IBus クライアント"
+
+#: ../src/main.c:128
+msgid "please specify engine name with --engine\n"
+msgstr "エンジンの名前を --engine で指定してください\n"
+
+#: ../src/main.c:144
+msgid "ibus-daemon is not running\n"
+msgstr "ibus-daemon が動いていません\n"
+
+#: ../src/main.c:175
+#, c-format
+msgid "can't create client: %s\n"
+msgstr "クライアントを起動できません: %s\n"

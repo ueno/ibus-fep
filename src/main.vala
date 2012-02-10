@@ -31,7 +31,7 @@ static int main (string[] args) {
     Intl.textdomain (Config.GETTEXT_PACKAGE);
 
     var option_context = new OptionContext (
-        _("- use IBus input method on text terminal"));
+        _("- IBus client for text terminals"));
     option_context.add_main_entries (options, "ibus-fep");
     try {
         option_context.parse (ref args);
@@ -41,14 +41,14 @@ static int main (string[] args) {
     }
 
     if (engine == null) {
-        stderr.printf ("please specify engine name with --engine\n");
+        stderr.printf (_("please specify engine name with --engine\n"));
         return 1;
     }
         
     IBus.init ();
     var bus = new IBus.Bus ();
     if (!bus.is_connected ()) {
-        stderr.printf ("ibus-daemon is not running\n");
+        stderr.printf (_("ibus-daemon is not running\n"));
         return 1;
     }
 
@@ -56,7 +56,7 @@ static int main (string[] args) {
     try {
         client = new Client (bus);
     } catch (Error e) {
-        stderr.printf ("can't create client: %s\n", e.message);
+        stderr.printf (_("can't create client: %s\n"), e.message);
         return 1;
     }
     client.engine = engine;
