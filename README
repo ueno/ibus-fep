@@ -2,27 +2,35 @@ ibus-fep -- IBus client for text terminals
 
 Usage:
 
-If you compile ibus-fep from source, you will need to install libfep
-from: http://github.com/ueno/libfep
+If you compile ibus-fep from source, you will need to install the
+libfep library avaliable from: http://github.com/ueno/libfep
+
+After install, run ibus-daemon as needed:
 
 $ ibus-daemon -rv --panel=disable &
+
+Then, start ibus-fep with:
+
+$ ibus-fep
+
+or:
 
 $ ibus-fep --engine=anthy
 
 or:
 
-$ ibus-fep --engine=pinyin -- /bin/sh
+$ ibus-fep --engine=pinyin -- /usr/bin/nano
 
-To toggle IME on/off, type Control+\ (backslash).  You can customize
-the keybinding with:
+To toggle IME on/off, type Control+\ (backslash).  The keybinding can
+be customized with:
 
-gconftool-2 --set /desktop/ibus/fep/toggle_shortcut --type string "Control+o"
+$ gconftool-2 --set /desktop/ibus/fep/toggle_shortcut --type string "Control+o"
 
 Limitations:
 
 * IMEs which expect X keycodes (ibus-hangul, etc.) cannot be used
 
-* License
+License:
 
 GPLv3+
 

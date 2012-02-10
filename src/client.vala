@@ -88,7 +88,11 @@ class Client : Fep.GClient {
         var builder = new StringBuilder ();
         if (enabled) {
             var desc = context.get_engine ();
-            builder.append ("[" + desc.symbol + "] ");
+            var symbol = desc.symbol;
+            if (symbol.length == 0) {
+                symbol = (desc.name.up () + "??").substring (0, 2);
+            }
+            builder.append ("[" + symbol + "] ");
         } else {
             builder.append ("[  ] ");
         }
