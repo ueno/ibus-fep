@@ -28,10 +28,17 @@ class Client : Fep.GClient {
     }
 
     IBus.InputContext context;
-    bool enabled = false;
     IBus.LookupTable lookup_table;
     bool preedit_visible = false;
     bool lookup_table_visible = false;
+
+    // FIXME: since ibus_input_context_{enable,disable} and the
+    // related code have been removed in ibus-1.5, we implement FEP
+    // on/off outside of the ibus input context.  Another idea is to
+    // make this class derived from IBusPanelService and track
+    // IBusPanelService::state-changed signal, but it doesn't allow
+    // the system panel to run at the same time when FEP is used.
+    bool enabled = false;
 
     string preedit = "";
     Fep.GAttribute? preedit_attr;
@@ -86,8 +93,8 @@ class Client : Fep.GClient {
 
     void update_status () {
         var builder = new StringBuilder ();
-        if (enabled) {
-            var desc = context.get_engine ();
+        var desc = context.get_engine ();
+        if (enabled && desc != null) {
             var symbol = desc.symbol;
             if (symbol.length == 0) {
                 symbol = (desc.name.up () + "??").substring (0, 2);
@@ -154,28 +161,21 @@ class Client : Fep.GClient {
             _ibus_hide_lookup_table ();
     }
 
-    void _ibus_enabled () {
-        enabled = true;
-        update_status ();
-    }
-
-    void _ibus_disabled () {
-        enabled = false;
-        update_status ();
-    }
-
     public override bool filter_key_event (uint keyval,
                                            uint modifiers)
     {
         if (keyval == toggle_keyval &&
             (modifiers & toggle_modifiers) != 0) {
             if (enabled)
-                context.disable ();
+                enabled = false;
             else
-                context.enable ();
+                enabled = true;
+            update_status ();
             return true;
         }
-        return context.process_key_event (keyval, 0, modifiers);
+        if (enabled)
+            return context.process_key_event (keyval, 0, modifiers);
+        return false;
     }
 
     bool watch_func (IOChannel source, IOCondition condition) {
@@ -214,11 +214,11 @@ class Client : Fep.GClient {
         context.hide_lookup_table.connect (_ibus_hide_lookup_table);
         context.update_lookup_table.connect (
             _ibus_update_lookup_table);
-        context.enabled.connect (_ibus_enabled);
-        context.disabled.connect (_ibus_disabled);
 
-        context.enable ();
+        context.focus_in ();
         context.set_capabilities (IBus.Capabilite.PREEDIT_TEXT);
+
+        enabled = true;
 
         var channel = new IOChannel.unix_new (get_poll_fd ());
         channel.add_watch (IOCondition.IN, watch_func);
