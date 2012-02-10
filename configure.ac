@@ -84,7 +84,6 @@ AM_GLIB_GNU_GETTEXT
 AC_CONFIG_FILES([
 Makefile
 src/Makefile
-m4/Makefile
 po/Makefile.in
 ])
 

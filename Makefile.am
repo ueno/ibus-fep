@@ -14,7 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS = m4 src po
+SUBDIRS = src po
+
+ACLOCAL_AMFLAGS = -I m4
+EXTRA_DIST = git.mk
 
 GITIGNOREFILES =				\
 	INSTALL					\
