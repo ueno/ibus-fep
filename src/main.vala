@@ -16,11 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static string engine;
-
 const OptionEntry[] options = {
-    {"engine", '\0', 0, OptionArg.STRING, ref engine,
-     N_("Engine name"), null },
     { null }
 };
 
@@ -40,11 +36,6 @@ static int main (string[] args) {
         return 1;
     }
 
-    if (engine == null) {
-        stderr.printf (_("please specify engine name with --engine\n"));
-        return 1;
-    }
-        
     IBus.init ();
     var bus = new IBus.Bus ();
     if (!bus.is_connected ()) {
@@ -59,7 +50,6 @@ static int main (string[] args) {
         stderr.printf (_("can't create client: %s\n"), e.message);
         return 1;
     }
-    client.engine = engine;
 
     IBus.main ();
 

@@ -17,7 +17,7 @@
 
 : ${FEP:=@FEP@}
 
-$FEP --engine "$ENGINE" &
+$FEP &
 
 if test "$#" = 0; then
     exec "$SHELL"

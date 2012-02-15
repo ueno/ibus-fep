@@ -31,7 +31,7 @@ namespace IBus {
 		public async void add_match_async (string rule, int timeout_msec, GLib.Cancellable cancellable);
 		public bool add_match_async_finish (GLib.AsyncResult res) throws GLib.Error;
 		public unowned IBus.InputContext create_input_context (string client_name);
-		public async void create_input_context_async (string client_name, int timeout_msec, GLib.Cancellable cancellable);
+		public async void create_input_context_async (string client_name, int timeout_msec, GLib.Cancellable? cancellable = null);
 		public unowned IBus.InputContext create_input_context_async_finish (GLib.AsyncResult res) throws GLib.Error;
 		public unowned string current_input_context ();
 		public async void current_input_context_async (int timeout_msec, GLib.Cancellable cancellable);

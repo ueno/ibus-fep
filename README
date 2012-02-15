@@ -5,26 +5,23 @@ Usage:
 If you compile ibus-fep from source, you will need to install the
 libfep library avaliable from: http://github.com/ueno/libfep
 
-After install, run ibus-daemon as needed:
+After install, make sure that ibus-daemon is running:
 
-$ ibus-daemon -rv --panel=disable &
+$ pgrep ibus-daemon
+2201
 
 Then, start ibus-fep with:
 
-$ ibus-fep
+$ XMODIFIERS= xterm -e ibus-fep
 
 or:
 
-$ ibus-fep --engine=anthy
+$ XMODIFIERS= xterm -e ibus-fep -- nano
 
-or:
-
-$ ibus-fep --engine=pinyin -- /usr/bin/nano
-
-To toggle IME on/off, type Control+\ (backslash).  The keybinding can
-be customized with:
-
-$ gconftool-2 --set /desktop/ibus/fep/toggle_shortcut --type string "Control+o"
+To switch IME, use the same hotkey as IBus used under X window system,
+typically Control+Space.  The keybinding can be customized with
+ibus-setup command (or with <hotkeys> element in
+/usr/share/ibus/*.xml).
 
 Limitations:
 

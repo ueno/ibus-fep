@@ -18,36 +18,4 @@
 : ${FEP:=@FEP@}
 : ${WRAPPER:=@WRAPPER@}
 
-TEMP=`getopt -o h --long help,engine: -n 'fep.wrapper' -- "$@"`
-eval set -- "$TEMP"
-
-usage() {
-    echo "Usage: $0 OPTIONS..."
-    echo "where OPTIONS are:"
-    echo " --engine=ENGINE Specify engine name"
-    echo " --help          Show this help"
-}
-
-ENGINE=
-while true ; do
-    case "$1" in
-	--engine)
-	    ENGINE="$2"
-	    shift 2
-	    ;;
-	-h|--help)
-	    usage
-	    exit
-	    ;;
-	--)
-	    shift
-	    break
-	    ;;
-	*)
-	    exit 1
-	    ;;
-    esac
-done
-
-export ENGINE
 exec "$FEP" -- "$WRAPPER" "$@"

@@ -17,28 +17,10 @@
  */
 
 class Client : Fep.GClient {
-    public string engine {
-        get {
-            var desc = context.get_engine ();
-            return desc.get_name ();
-        }
-        set {
-            context.set_engine (value);
-        }
-    }
-
-    IBus.InputContext context;
+    IBus.InputContext context = null;
     IBus.LookupTable lookup_table;
     bool preedit_visible = false;
     bool lookup_table_visible = false;
-
-    // FIXME: since ibus_input_context_{enable,disable} and the
-    // related code have been removed in ibus-1.5, we implement FEP
-    // on/off outside of the ibus input context.  Another idea is to
-    // make this class derived from IBusPanelService and track
-    // IBusPanelService::state-changed signal, but it doesn't allow
-    // the system panel to run at the same time when FEP is used.
-    bool enabled = false;
 
     string preedit = "";
     Fep.GAttribute? preedit_attr;
@@ -94,7 +76,7 @@ class Client : Fep.GClient {
     void update_status () {
         var builder = new StringBuilder ();
         var desc = context.get_engine ();
-        if (enabled && desc != null) {
+        if (desc != null) {
             var symbol = desc.symbol;
             if (symbol.length == 0) {
                 symbol = (desc.name.up () + "??").substring (0, 2);
@@ -161,19 +143,18 @@ class Client : Fep.GClient {
             _ibus_hide_lookup_table ();
     }
 
+    void _ibus_enabled () {
+        update_status ();
+    }
+
+    void _ibus_disabled () {
+        update_status ();
+    }
+
     public override bool filter_key_event (uint keyval,
                                            uint modifiers)
     {
-        if (keyval == toggle_keyval &&
-            (modifiers & toggle_modifiers) != 0) {
-            if (enabled)
-                enabled = false;
-            else
-                enabled = true;
-            update_status ();
-            return true;
-        }
-        if (enabled)
+        if (context != null)
             return context.process_key_event (keyval, 0, modifiers);
         return false;
     }
@@ -183,28 +164,7 @@ class Client : Fep.GClient {
         return true;
     }
 
-    IBus.Config config;
-
-    uint toggle_keyval = IBus.backslash;
-    uint toggle_modifiers = IBus.ModifierType.CONTROL_MASK;
-
-    public Client (IBus.Bus bus) throws Error {
-        Object (address: null);
-        init (null);
-
-        config = bus.get_config ();
-        var values = config.get_values ("fep");
-        if (values != null) {
-            var value = values.lookup_value ("toggle_shortcut",
-                                             VariantType.STRING);
-            if (value != null) {
-                IBus.key_event_from_string (value.get_string (),
-                                            out toggle_keyval,
-                                            out toggle_modifiers);
-            }
-        }
-
-        context = bus.create_input_context ("ibus-fep");
+    void create_input_context_done () {
         context.commit_text.connect (_ibus_commit_text);
         context.show_preedit_text.connect (_ibus_show_preedit_text);
         context.hide_preedit_text.connect (_ibus_hide_preedit_text);
@@ -214,11 +174,30 @@ class Client : Fep.GClient {
         context.hide_lookup_table.connect (_ibus_hide_lookup_table);
         context.update_lookup_table.connect (
             _ibus_update_lookup_table);
-
+        // FIXME: Enable input context is abolished in ibus-1.5, while
+        // it is still necessary for ibus-1.4.  Please comment the
+        // following 3 lines when compiling with ibus-1.5.
+        context.enabled.connect (_ibus_enabled);
+        context.disabled.connect (_ibus_disabled);
+        context.enable ();
+        context.set_capabilities (IBus.Capabilite.PREEDIT_TEXT |
+                                  IBus.Capabilite.LOOKUP_TABLE |
+                                  IBus.Capabilite.FOCUS);
         context.focus_in ();
-        context.set_capabilities (IBus.Capabilite.PREEDIT_TEXT);
+    }
 
-        enabled = true;
+    public Client (IBus.Bus bus) throws Error {
+        Object (address: null);
+        init (null);
+
+        bus.create_input_context_async ("ibus-fep", -1, null, (obj, res) => {
+                try {
+                    context = bus.create_input_context_async_finish (res);
+                    create_input_context_done ();
+                } catch (Error e) {
+                    warning ("can't create input context: %s", e.message);
+                }
+            });
 
         var channel = new IOChannel.unix_new (get_poll_fd ());
         channel.add_watch (IOCondition.IN, watch_func);
