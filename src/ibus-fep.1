@@ -4,21 +4,24 @@
 ibus-fep \- IBus client for text terminals
 .SH SYNOPSIS
 .B ibus-fep
-.RI [ options ] [-- commands]
+.RI [-- commands]
 .br
 .SH DESCRIPTION
 \fBibus-fep\fP is an IBus client for text terminals.
-.SH OPTIONS
-The \fBibus-fep\fP command follows the usual GNU command line syntax, with
-long options starting with two dashes (`-').  A summary of options is
-included below.
+.SH EXAMPLE
 .TP
-.B \-h, \-\-help
-Show summary of options.
+$ pgrep -lf ibus-daemon
+make sure that ibus-daemon is running
 .TP
-.B \-e, \-\-engine=\fIENGINE\fR
-Specify engine name.
+$ unset XMODIFIERS
+disable XIM
+.TP
+$ xterm -e ibus-fep
+run a default shell program under ibus-fep
+.TP
+$ xterm -e ibus-fep -- nano
+run GNU nano instead of shell under ibus-fep
 .SH SEE ALSO
-\fBfep\fR(1)
+\fBfep\fR(1), \fBxterm\fR(1)
 .SH AUTHOR
 ibus-fep was written by Daiki Ueno <ueno@unixuser.org>.
