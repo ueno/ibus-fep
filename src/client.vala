@@ -75,7 +75,12 @@ class Client : Fep.GClient {
 
     void update_status () {
         var builder = new StringBuilder ();
-        var desc = context.get_engine ();
+        IBus.EngineDesc? desc = null;
+        // FIXME: Enable input context is abolished in ibus-1.5, while
+        // it is still necessary for ibus-1.4.  Please comment the
+        // following 2 lines when compiling with ibus-1.5.
+        if (context.is_enabled ())
+            desc = context.get_engine ();
         if (desc != null) {
             var symbol = desc.symbol;
             if (symbol.length == 0) {
@@ -154,8 +159,12 @@ class Client : Fep.GClient {
     public override bool filter_key_event (uint keyval,
                                            uint modifiers)
     {
-        if (context != null)
-            return context.process_key_event (keyval, 0, modifiers);
+        if (context != null) {
+            var retval = context.process_key_event (keyval, 0, modifiers);
+            if (retval)
+                update_status ();
+            return retval;
+        }
         return false;
     }
 
