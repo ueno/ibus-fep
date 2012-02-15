@@ -59,6 +59,9 @@ AC_SUBST(DATE_DISPLAY)
 PKG_CHECK_MODULES(IBUS, [ibus-1.0 >= 1.4.0], ,
   AC_MSG_ERROR([can't find ibus]))
 
+PKG_CHECK_MODULES(IBUS_1_5, [ibus-1.0 >= 1.4.99], ibus_1_5=yes, ibus_1_5=no)
+AM_CONDITIONAL(IBUS_1_5, [test x$ibus_1_5 = xyes])
+
 # check libfep
 PKG_CHECK_MODULES(LIBFEP, [libfep-glib >= 0.0.4], ,
   AC_MSG_ERROR([can't find libfep]))

@@ -27,6 +27,10 @@ fep_VALAFLAGS =					\
 	--pkg posix				\
 	$(VALAFLAGS)
 
+if IBUS_1_5
+fep_VALAFLAGS += -D IBUS_1_5
+endif
+
 fep_CFLAGS =					\
 	$(IBUS_CFLAGS)				\
 	$(LIBFEP_CFLAGS)			\
