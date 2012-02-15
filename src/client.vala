@@ -174,16 +174,24 @@ class Client : Fep.GClient {
         context.hide_lookup_table.connect (_ibus_hide_lookup_table);
         context.update_lookup_table.connect (
             _ibus_update_lookup_table);
+
         // FIXME: Enable input context is abolished in ibus-1.5, while
         // it is still necessary for ibus-1.4.  Please comment the
         // following 3 lines when compiling with ibus-1.5.
         context.enabled.connect (_ibus_enabled);
         context.disabled.connect (_ibus_disabled);
         context.enable ();
+
         context.set_capabilities (IBus.Capabilite.PREEDIT_TEXT |
                                   IBus.Capabilite.LOOKUP_TABLE |
                                   IBus.Capabilite.FOCUS);
         context.focus_in ();
+
+        // FIXME: with ibus-1.5, every input context always has active
+        // engine, while it may not with ibus-1.4.  Thus we can update
+        // status here.  Please uncomment the following line when
+        // compiling with ibus-1.5.
+        // update_status ();
     }
 
     public Client (IBus.Bus bus) throws Error {
