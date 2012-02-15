@@ -5,10 +5,16 @@ Usage:
 If you compile ibus-fep from source, you will need to install the
 libfep library avaliable from: http://github.com/ueno/libfep
 
-After install, make sure that ibus-daemon is running:
+ibus-fep is merely an IBus client like the GTK IM module (im-ibus.so),
+not a bus nor panel replacement.  So, before running ibus-fep, make
+sure that ibus-daemon is running:
 
-$ pgrep ibus-daemon
-2201
+$ pgrep -lf ibus-daemon
+2201 /usr/bin/ibus-daemon -r --xim
+
+Otherwise, start it manually with:
+
+$ ibus-daemon
 
 Then, start ibus-fep with:
 
@@ -18,9 +24,9 @@ or:
 
 $ XMODIFIERS= xterm -e ibus-fep -- nano
 
-To switch IME, use the same hotkey as IBus used under X window system,
-typically Control+Space.  The keybinding can be customized with
-ibus-setup command (or with <hotkeys> element in
+To switch between IMEs, use the same hotkey as IBus used under X
+window system, typically Control+Space.  The keybinding can be
+customized with ibus-setup command (or with <hotkeys> element in
 /usr/share/ibus/*.xml).
 
 Limitations:
