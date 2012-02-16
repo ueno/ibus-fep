@@ -15,7 +15,7 @@ $ pgrep -lf ibus-daemon
 2201 /usr/bin/ibus-daemon -r --xim
 
 Otherwise, run it manually.  Please be aware that some of required
-IBus component (ibus-gconf, etc.) may fail to start when dbus-daemon
+IBus components (ibus-gconf, etc.) may fail to start when dbus-daemon
 is not running.  See the dbus-launch manual page to start dbus-daemon:
 
 $ eval `dbus-launch --sh-syntax --exit-with-session`
@@ -38,9 +38,9 @@ Limitations:
 
 * IMEs which expect X keycodes (ibus-hangul, etc.) cannot be used
 
-* Some keys (for example, Hiragana_Katakana, etc.) are not recognized
-  because of tty limitation.  If you use such a keys as IME trigger,
-  you will need to assign other keys (Control+o, Control+\, etc.)
+* Some keys (Hiragana_Katakana, etc.) are not recognized because of
+  tty limitation.  If you use such a keys as IME trigger, you will
+  need to assign other keys (Control+o, Control+\, etc.)
 
 License:
 
