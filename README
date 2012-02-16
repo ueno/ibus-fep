@@ -1,9 +1,11 @@
 ibus-fep -- IBus client for text terminals
 
-Usage:
+Install:
 
 If you compile ibus-fep from source, you will need to install the
 libfep library avaliable from: http://github.com/ueno/libfep
+
+Usage:
 
 ibus-fep is merely an IBus client like the GTK IM module (im-ibus.so),
 not a bus nor panel replacement.  So, before running ibus-fep, make
@@ -12,8 +14,11 @@ sure that ibus-daemon is running:
 $ pgrep -lf ibus-daemon
 2201 /usr/bin/ibus-daemon -r --xim
 
-Otherwise, start it manually with:
+Otherwise, run it manually.  Please be aware that some of required
+IBus component (ibus-gconf, etc.) may fail to start when dbus-daemon
+is not running.  See the dbus-launch manual page to start dbus-daemon:
 
+$ eval `dbus-launch --sh-syntax --exit-with-session`
 $ ibus-daemon
 
 Then, start ibus-fep with:
@@ -32,6 +37,10 @@ customized with ibus-setup command (or with <hotkeys> element in
 Limitations:
 
 * IMEs which expect X keycodes (ibus-hangul, etc.) cannot be used
+
+* Some keys (for example, Hiragana_Katakana, etc.) are not recognized
+  because of tty limitation.  If you use such a keys as IME trigger,
+  you will need to assign other keys (Control+o, Control+\, etc.)
 
 License:
 
