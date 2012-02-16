@@ -77,26 +77,33 @@ class Client : Fep.GClient {
         }
     }
 
+    string format_indicator () {
+        var desc = context.get_engine ();
+        if (desc != null) {
+            var symbol = desc.symbol;
+            if (symbol.length == 0) {
+                symbol = (desc.name.up () + "??").substring (0, 2);
+            }
+            return "[" + symbol + "] ";
+        } else {
+            return "[??] ";
+        }
+    }
+
     void update_status () {
         var builder = new StringBuilder ();
-#if !IBUS_1_5
+
+        // on ibus-1.5, context has always an active engine
+#if IBUS_1_5
+        builder.append (format_indicator ());
+#else
         if (enabled) {
-#endif
-            var desc = context.get_engine ();
-            if (desc != null) {
-                var symbol = desc.symbol;
-                if (symbol.length == 0) {
-                    symbol = (desc.name.up () + "??").substring (0, 2);
-                }
-                builder.append ("[" + symbol + "] ");
-            } else {
-                builder.append ("[??] ");
-            }
-#if !IBUS_1_5
+            builder.append (format_indicator ());
         } else {
             builder.append ("[  ] ");
         }
 #endif
+
         Fep.GAttribute? attr = null;
         if (lookup_table_visible) {
             var pages = lookup_table.cursor_pos /
@@ -155,6 +162,7 @@ class Client : Fep.GClient {
             _ibus_hide_lookup_table ();
     }
 
+    // on ibus-1.5, no need to track enable/disable of context
 #if !IBUS_1_5
     void _ibus_enabled () {
         enabled = true;
@@ -195,19 +203,19 @@ class Client : Fep.GClient {
         context.update_lookup_table.connect (
             _ibus_update_lookup_table);
 
-#if !IBUS_1_5
-        context.enabled.connect (_ibus_enabled);
-        context.disabled.connect (_ibus_disabled);
-        context.enable ();
-#endif
-
         context.set_capabilities (IBus.Capabilite.PREEDIT_TEXT |
                                   IBus.Capabilite.LOOKUP_TABLE |
                                   IBus.Capabilite.FOCUS);
         context.focus_in ();
 
 #if IBUS_1_5
+        // on ibus-1.5, context has always an active engine
         update_status ();
+#else
+        // on ibus-1.4, need to track enable/disable of context
+        context.enabled.connect (_ibus_enabled);
+        context.disabled.connect (_ibus_disabled);
+        context.enable ();
 #endif
     }
 
