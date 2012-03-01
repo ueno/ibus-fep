@@ -162,8 +162,11 @@ class Client : Fep.GClient {
             _ibus_hide_lookup_table ();
     }
 
-    // on ibus-1.5, no need to track enable/disable of context
-#if !IBUS_1_5
+#if IBUS_1_5
+    void _ibus_global_engine_changed (string name) {
+        update_status ();
+    }
+#else
     void _ibus_enabled () {
         enabled = true;
         update_status ();
@@ -223,6 +226,9 @@ class Client : Fep.GClient {
         Object (address: null);
         init (null);
 
+#if IBUS_1_5
+        bus.global_engine_changed.connect (_ibus_global_engine_changed);
+#endif
         bus.create_input_context_async ("ibus-fep", -1, null, (obj, res) => {
                 try {
                     context = bus.create_input_context_async_finish (res);
