@@ -38,9 +38,10 @@ Limitations:
 
 * IMEs which expect X keycodes (ibus-hangul, etc.) cannot be used
 
-* Some keys (Hiragana_Katakana, etc.) are not recognized because of
-  tty limitation.  If you use such a keys as IME trigger, you will
-  need to assign other keys (Control+o, Control+\, etc.)
+* Some keys (Hiragana_Katakana, etc.) are not recognized because there
+  are no corresponding escape sequences.  If you use such a keys as IME
+  trigger, you will need to assign additional keys (Control+Space,
+  Control+\, etc.) to IME trigger.
 
 License:
 
