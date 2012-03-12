@@ -208,6 +208,7 @@ class Client : Fep.GClient {
 
         context.set_capabilities (IBus.Capabilite.PREEDIT_TEXT |
                                   IBus.Capabilite.LOOKUP_TABLE |
+                                  IBus.Capabilite.AUXILIARY_TEXT |
                                   IBus.Capabilite.FOCUS);
         context.focus_in ();
 
