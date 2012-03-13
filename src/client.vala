@@ -113,7 +113,7 @@ class Client : Fep.GClient {
                 start + lookup_table.page_size,
                 lookup_table.get_number_of_candidates ());
             for (var index = start; index < end; index++) {
-                var label = lookup_table.get_label (index);
+                var label = lookup_table.get_label (index - start);
                 var candidate = lookup_table.get_candidate (index);
                 var label_text = label != null ?
                     label.get_text () :
