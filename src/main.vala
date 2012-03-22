@@ -16,9 +16,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const OptionEntry[] options = {
-    { null }
-};
+public class Options {
+    public string? style = null;
+    public bool dontsave = false;
+    public bool dontload = false;
+    public OptionEntry[] entries;
+    public OptionContext option_context;
+    public Options () {
+        option_context = new OptionContext (
+            _("[-- COMMAND...]  - IBus client for text terminals"));
+        OptionEntry e_style = {"style", 's', 0, OptionArg.STRING,
+            out this.style, "Input style (default: over-the-spot)", "[root]"};
+        OptionEntry e_temp = {"temp", 't', 0, OptionArg.NONE,
+            out this.dontsave, "Don't save settings", null};
+        OptionEntry e_noconf = {"noconf", 'n', 0, OptionArg.NONE,
+            out this.dontload, "Don't load settings (implies --temp)", null};
+        OptionEntry e_null = {null};
+        option_context.add_main_entries ({e_style, e_temp, e_noconf, e_null},
+            "ibus-fep");
+    }
+}
+
+static void close_child (Pid pid, int status) {
+    Process.close_pid (pid);
+    IBus.quit ();
+}
 
 static int main (string[] args) {
     Intl.setlocale (LocaleCategory.ALL, "");
@@ -26,12 +48,30 @@ static int main (string[] args) {
     Intl.bind_textdomain_codeset (Config.GETTEXT_PACKAGE, "UTF-8");
     Intl.textdomain (Config.GETTEXT_PACKAGE);
 
-    var option_context = new OptionContext (
-        _("- IBus client for text terminals"));
-    option_context.add_main_entries (options, "ibus-fep");
+    var o = new Options ();
+    stderr.printf("\n\n"); /* hack to show the first line */
     try {
-        option_context.parse (ref args);
+        o.option_context.parse (ref args);
     } catch (OptionError e) {
+        stderr.printf ("%s\n", e.message);
+        return 1;
+    }
+
+    string[] argv = {};
+    if (args.length > 1) {
+        for (int i = 1; i < args.length; i++)
+                argv += args[i];
+    }
+    if (argv.length == 0)
+        argv += Environment.get_variable ("SHELL");
+    try {
+        Pid pid;
+        if (Process.spawn_async_with_pipes
+                (null, argv, null, SpawnFlags.DO_NOT_REAP_CHILD |
+                 SpawnFlags.CHILD_INHERITS_STDIN | SpawnFlags.SEARCH_PATH,
+                 null, out pid, null, null, null))
+            ChildWatch.add (pid, close_child);
+    } catch (SpawnError e) {
         stderr.printf ("%s\n", e.message);
         return 1;
     }
@@ -43,9 +83,28 @@ static int main (string[] args) {
         return 1;
     }
 
+    IBus.Config config = bus.get_config ();
+    if (o.dontload == false) {
+        if (o.style == null) {
+            Variant? values = config.get_values ("fep");
+            if (values != null) {
+                /* FIXME: should iterate and check for "style" */
+                Variant? v = config.get_value ("fep", "style");
+                if (v != null) {
+                    o.style = v.get_string ();
+                }
+            }
+        }
+        if (o.dontsave == false) {
+            if (o.style != "root")
+                o.style = "over-the-spot";
+            config.set_value ("fep", "style", o.style);
+        }
+    }
+
     Client client;
     try {
-        client = new Client (bus);
+        client = new Client (bus, o);
     } catch (Error e) {
         stderr.printf (_("can't create client: %s\n"), e.message);
         return 1;
