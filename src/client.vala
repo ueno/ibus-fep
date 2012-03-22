@@ -21,6 +21,7 @@ class Client : Fep.GClient {
     IBus.LookupTable lookup_table;
     bool preedit_visible = false;
     bool lookup_table_visible = false;
+    bool root = false;
 
     string preedit = "";
     Fep.GAttribute? preedit_attr;
@@ -38,12 +39,20 @@ class Client : Fep.GClient {
     }
 
     void _ibus_show_preedit_text () {
-        set_cursor_text (preedit, preedit_attr);
+        if (root) {
+            set_status_text (preedit, preedit_attr);
+            status = preedit;
+            status_attr = preedit_attr;
+        } else
+            set_cursor_text (preedit, preedit_attr);
         preedit_visible = true;
     }
 
     void _ibus_hide_preedit_text () {
-        set_cursor_text ("", null);
+        if (root)
+            update_status ();
+        else
+            set_cursor_text ("", null);
         preedit_visible = false;
     }
 
@@ -223,13 +232,15 @@ class Client : Fep.GClient {
 #endif
     }
 
-    public Client (IBus.Bus bus) throws Error {
+    public Client (IBus.Bus bus, Options opt) throws Error {
         Object (address: null);
         init (null);
 
 #if IBUS_1_5
         bus.global_engine_changed.connect (_ibus_global_engine_changed);
 #endif
+        if (opt.style == "root")
+            root = true;
         bus.create_input_context_async ("ibus-fep", -1, null, (obj, res) => {
                 try {
                     context = bus.create_input_context_async_finish (res);

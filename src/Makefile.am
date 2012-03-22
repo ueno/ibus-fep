@@ -49,22 +49,16 @@ GITIGNOREFILES =				\
 	fep_vala.stamp				\
 	$(NULL)
 
-EXTRA_DIST = config.vapi ibus-1.0.deps ibus-1.0.vapi ibus-fep.in fep.wrapper.in
-DISTCLEANFILES = ibus-fep fep.wrapper
+EXTRA_DIST = config.vapi ibus-1.0.deps ibus-1.0.vapi ibus-fep.in
+DISTCLEANFILES = ibus-fep
 
 feplibexecdir = $(pkglibexecdir)
-feplibexec_SCRIPTS = fep.wrapper
 
 bin_SCRIPTS = ibus-fep
 
 ibus-fep: ibus-fep.in
 	$(AM_V_GEN) sed -e "s!@FEP\@!"$(FEP)"!" \
-	-e "s!@WRAPPER\@!"$(pkglibexecdir)/fep.wrapper"!" \
-	$< > $@.tmp && \
-	mv $@.tmp $@
-
-fep.wrapper: fep.wrapper.in
-	$(AM_V_GEN) sed -e "s!@FEP\@!"$(pkglibexecdir)/fep"!" \
+	-e "s!@CLIENT\@!"$(pkglibexecdir)/fep"!" \
 	$< > $@.tmp && \
 	mv $@.tmp $@
 

@@ -1,27 +1,41 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
 .TH IBUS-FEP 1 "10 Feb 2012"
 .SH NAME
-ibus-fep \- IBus client for text terminals
+ibus\-fep - IBus client for text terminals
 .SH SYNOPSIS
-.B ibus-fep
+.B ibus\-fep
+.RI [ options ]
 .RI [ \-\-\ commands ]
 .br
 .SH DESCRIPTION
-\fBibus-fep\fP is an IBus client for text terminals.
+\fBibus\-fep\fP is an IBus client for text terminals.
+.SH OPTIONS
+.TP
+.B \-h, \-\-help
+Show summary of options.
+.TP
+.B \-s, \-\-style=\fISTYLE\fR
+Specify input style ("root" or over\-the\-spot).
+.TP
+.B \-t, \-\-temp
+Skip saving of input style.
+.TP
+.B \-n, \-\-noconf
+Skip loading and saving of input style.
 .SH EXAMPLE
 .TP
-$ pgrep \-lf ibus-daemon
+$ pgrep \-lf ibus\-daemon
 make sure that ibus-daemon is running
 .TP
 $ unset XMODIFIERS
 disable XIM
 .TP
-$ xterm \-e ibus-fep
-run a default shell program under ibus-fep
+$ xterm \-e ibus\-fep
+run a default shell program under ibus\-fep
 .TP
-$ xterm \-e ibus-fep \-\- nano
-run GNU nano instead of shell under ibus-fep
+$ xterm \-e ibus\-fep \-\- nano
+run GNU nano instead of shell under ibus\-fep
 .SH SEE ALSO
 \fBfep\fR(1), \fBxterm\fR(1)
 .SH AUTHOR
-ibus-fep was written by Daiki Ueno <ueno@unixuser.org>.
+ibus\-fep was written by Daiki Ueno <ueno@unixuser.org>.
