@@ -16,25 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-const OptionEntry[] options = {
+string? opt_preedit_style = null;
+
+const OptionEntry entries[] = {
+    { "preedit-style", 's', 0, OptionArg.STRING,
+      out opt_preedit_style,
+      "Preedit style (default: over-the-spot)", "[root]" },
     { null }
 };
+
+static void close_child (Pid pid, int status) {
+    Process.close_pid (pid);
+    IBus.quit ();
+}
 
 static int main (string[] args) {
     Intl.setlocale (LocaleCategory.ALL, "");
     Intl.bindtextdomain (Config.GETTEXT_PACKAGE, Config.LOCALEDIR);
     Intl.bind_textdomain_codeset (Config.GETTEXT_PACKAGE, "UTF-8");
     Intl.textdomain (Config.GETTEXT_PACKAGE);
-
-    var option_context = new OptionContext (
-        _("- IBus client for text terminals"));
-    option_context.add_main_entries (options, "ibus-fep");
-    try {
-        option_context.parse (ref args);
-    } catch (OptionError e) {
-        stderr.printf ("%s\n", e.message);
-        return 1;
-    }
 
     IBus.init ();
     var bus = new IBus.Bus ();
@@ -43,9 +43,66 @@ static int main (string[] args) {
         return 1;
     }
 
+    Options opts = Options () { preedit_style = PreeditStyle.DEFAULT };
+
+    var context = new OptionContext (
+        _("[-- COMMAND...]  - IBus client for text terminals"));
+    context.add_main_entries (entries, "ibus-fep");
+
+    stderr.printf("\n\n"); /* hack to show the first line */
+    try {
+        context.parse (ref args);
+    } catch (OptionError e) {
+        stderr.printf ("%s\n", e.message);
+        return 1;
+    }
+
+    if (opt_preedit_style == null) {
+        var config = bus.get_config ();
+        Variant? values = config.get_values ("fep");
+        if (values != null) {
+            Variant? value = values.lookup_value ("preedit_style",
+                                                  VariantType.STRING);
+            if (value != null) {
+                opt_preedit_style = value.get_string ();
+            }
+        }
+    }
+
+    if (opt_preedit_style != null) {
+        EnumClass eclass = (EnumClass) typeof(PreeditStyle).class_ref ();
+        EnumValue? evalue = eclass.get_value_by_nick (opt_preedit_style);
+        if (evalue == null) {
+            stderr.printf (_("unknown preedit style %s"), opt_preedit_style);
+            return 1;
+        }            
+        opts.preedit_style = (PreeditStyle) evalue.value;
+    }
+
+    string[]? argv;
+    if (args.length > 1) {
+        argv = args[1 : args.length];
+    } else {
+        argv = { Environment.get_variable ("SHELL") };
+    }
+
+    try {
+        Pid pid;
+        if (Process.spawn_async (
+                null, argv, null,
+                SpawnFlags.DO_NOT_REAP_CHILD |
+                SpawnFlags.CHILD_INHERITS_STDIN |
+                SpawnFlags.SEARCH_PATH,
+                null, out pid))
+            ChildWatch.add (pid, close_child);
+    } catch (SpawnError e) {
+        stderr.printf ("%s\n", e.message);
+        return 1;
+    }
+
     Client client;
     try {
-        client = new Client (bus);
+        client = new Client (bus, opts);
     } catch (Error e) {
         stderr.printf (_("can't create client: %s\n"), e.message);
         return 1;

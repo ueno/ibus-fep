@@ -1,27 +1,41 @@
 .\"                                      Hey, EMACS: -*- nroff -*-
 .TH IBUS-FEP 1 "10 Feb 2012"
 .SH NAME
-ibus-fep \- IBus client for text terminals
+ibus\-fep - IBus client for text terminals
 .SH SYNOPSIS
-.B ibus-fep
-.RI [ \-\-\ commands ]
+.B ibus\-fep
+.RI [ options ]
+[\-\-
+.I command
+.RI [ args ]]
 .br
 .SH DESCRIPTION
-\fBibus-fep\fP is an IBus client for text terminals.
+\fBibus\-fep\fP is an IBus client for text terminals.
+.SH OPTIONS
+.TP
+.B \-h, \-\-help
+Show summary of options.
+.TP
+.B \-s, \-\-preedit\-style=\fISTYLE\fR
+Specify input style ("root" or "over\-the\-spot").
+The default is "over\-the\-spot" which shows preedit text at the
+cursor position.
+If you don't like it because it can overwrite the screen,
+use "root" which places preedit text at the bottom line of the screen.
 .SH EXAMPLE
 .TP
-$ pgrep \-lf ibus-daemon
+$ pgrep \-lf ibus\-daemon
 make sure that ibus-daemon is running
 .TP
 $ unset XMODIFIERS
 disable XIM
 .TP
-$ xterm \-e ibus-fep
-run a default shell program under ibus-fep
+$ xterm \-e ibus\-fep
+run a default shell program under ibus\-fep
 .TP
-$ xterm \-e ibus-fep \-\- nano
-run GNU nano instead of shell under ibus-fep
+$ xterm \-e ibus\-fep \-\- nano
+run GNU nano instead of shell under ibus\-fep
 .SH SEE ALSO
 \fBfep\fR(1), \fBxterm\fR(1)
 .SH AUTHOR
-ibus-fep was written by Daiki Ueno <ueno@unixuser.org>.
+ibus\-fep was written by Daiki Ueno <ueno@unixuser.org>.

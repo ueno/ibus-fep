@@ -16,6 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 : ${FEP:=@FEP@}
-: ${WRAPPER:=@WRAPPER@}
+: ${CLIENT:=@CLIENT@}
 
-exec "$FEP" -- "$WRAPPER" "$@"
+exec "$FEP" -- "$CLIENT" "$@"
