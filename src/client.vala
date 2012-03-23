@@ -16,11 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+enum PreeditStyle {
+    OVER_THE_SPOT,
+    ROOT,
+    DEFAULT = OVER_THE_SPOT
+}
+
+struct Options {
+    public PreeditStyle preedit_style;
+}
+
 class Client : Fep.GClient {
     IBus.InputContext context = null;
     IBus.LookupTable lookup_table;
     bool preedit_visible = false;
     bool lookup_table_visible = false;
+    Options opts;
 
     string preedit = "";
     Fep.GAttribute? preedit_attr;
@@ -38,12 +49,20 @@ class Client : Fep.GClient {
     }
 
     void _ibus_show_preedit_text () {
-        set_cursor_text (preedit, preedit_attr);
+        if (opts.preedit_style == PreeditStyle.ROOT) {
+            set_status_text (preedit, preedit_attr);
+            status = preedit;
+            status_attr = preedit_attr;
+        } else
+            set_cursor_text (preedit, preedit_attr);
         preedit_visible = true;
     }
 
     void _ibus_hide_preedit_text () {
-        set_cursor_text ("", null);
+        if (opts.preedit_style == PreeditStyle.ROOT)
+            update_status ();
+        else
+            set_cursor_text ("", null);
         preedit_visible = false;
     }
 
@@ -223,9 +242,10 @@ class Client : Fep.GClient {
 #endif
     }
 
-    public Client (IBus.Bus bus) throws Error {
+    public Client (IBus.Bus bus, Options opts) throws Error {
         Object (address: null);
         init (null);
+        this.opts = opts;
 
 #if IBUS_1_5
         bus.global_engine_changed.connect (_ibus_global_engine_changed);
