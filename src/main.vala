@@ -67,25 +67,6 @@ static int main (string[] args) {
         return 1;
     }
 
-    if (opt_preedit_style == null) {
-        var config = bus.get_config ();
-        Variant? values = config.get_values ("fep");
-        if (values != null) {
-            Variant? value = values.lookup_value ("preedit_style",
-                                                  VariantType.INT32);
-            if (value != null) {
-                EnumValue? evalue = preedit_style_class.get_value (
-                    value.get_int32 ());
-                if (evalue != null) {
-                    opts.preedit_style = (PreeditStyle) evalue.value;
-                } else {
-                    warning ("invalid preedit style %d - ignoring",
-                             value.get_int32 ());
-                }
-            }
-        }
-    }
-
     string[]? argv;
     if (args.length > 1) {
         argv = args[1 : args.length];
