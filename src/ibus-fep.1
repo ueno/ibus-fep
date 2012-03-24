@@ -5,7 +5,9 @@ ibus\-fep - IBus client for text terminals
 .SH SYNOPSIS
 .B ibus\-fep
 .RI [ options ]
-.RI [ \-\-\ commands ]
+[\-\-
+.I command
+.RI [ args ]]
 .br
 .SH DESCRIPTION
 \fBibus\-fep\fP is an IBus client for text terminals.
@@ -14,14 +16,11 @@ ibus\-fep - IBus client for text terminals
 .B \-h, \-\-help
 Show summary of options.
 .TP
-.B \-s, \-\-style=\fISTYLE\fR
-Specify input style ("root" or over\-the\-spot).
-.TP
-.B \-t, \-\-temp
-Skip saving of input style.
-.TP
-.B \-n, \-\-noconf
-Skip loading and saving of input style.
+.B \-s, \-\-preedit\-style=\fISTYLE\fR
+Specify input style ("root" or "over\-the\-spot").
+The default is "over\-the\-spot" which shows preedit text at the cursor position.
+If you don't like it because it can overwrite the screen,
+use "root" which places preedit text at the bottom line of the screen.
 .SH EXAMPLE
 .TP
 $ pgrep \-lf ibus\-daemon
