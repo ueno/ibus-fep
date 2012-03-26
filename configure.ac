@@ -22,7 +22,7 @@ m4_define([package_name], [ibus-fep])
 m4_define([ibus_released], [1])
 m4_define([ibus_major_version], [1])
 m4_define([ibus_minor_version], [4])
-m4_define([ibus_micro_version], [3])
+m4_define([ibus_micro_version], [4])
 m4_define(ibus_maybe_datestamp,
     m4_esyscmd([if test x]ibus_released[ != x1; then date +.%Y%m%d | tr -d '\n\r'; fi]))
 
@@ -63,7 +63,7 @@ PKG_CHECK_MODULES(IBUS_1_5, [ibus-1.0 >= 1.4.99], ibus_1_5=yes, ibus_1_5=no)
 AM_CONDITIONAL([IBUS_1_5], [test x$ibus_1_5 = xyes])
 
 # check libfep
-PKG_CHECK_MODULES(LIBFEP, [libfep-glib >= 0.0.4], ,
+PKG_CHECK_MODULES(LIBFEP, [libfep-glib >= 0.0.7], ,
   AC_MSG_ERROR([can't find libfep]))
 
 AC_PATH_PROG([FEP], [fep])
