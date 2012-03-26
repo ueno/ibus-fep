@@ -17,9 +17,9 @@
 # force include config.h before gi18n.h.
 AM_CPPFLAGS = -include $(CONFIG_HEADER)
 
-pkglibexec_PROGRAMS = fep
+libexec_PROGRAMS = ibus-fep-client
 
-fep_VALAFLAGS =					\
+ibus_fep_client_VALAFLAGS =			\
 	--vapidir=$(srcdir)			\
 	--pkg config				\
 	--pkg ibus-1.0				\
@@ -28,37 +28,35 @@ fep_VALAFLAGS =					\
 	$(VALAFLAGS)
 
 if IBUS_1_5
-fep_VALAFLAGS += -D IBUS_1_5
+ibus_fep_client_VALAFLAGS += -D IBUS_1_5
 endif
 
-fep_CFLAGS =					\
+ibus_fep_client_CFLAGS =			\
 	$(IBUS_CFLAGS)				\
 	$(LIBFEP_CFLAGS)			\
 	-DLOCALEDIR=\"$(datadir)/locale\"	\
 	$(NULL)
 
-fep_LDADD =					\
+ibus_fep_client_LDADD =				\
 	$(IBUS_LIBS)				\
 	$(LIBFEP_LIBS)				\
 	$(NULL)
 
-fep_SOURCES = client.vala main.vala
+ibus_fep_client_SOURCES = client.vala main.vala
 
 GITIGNOREFILES =				\
-	$(fep_SOURCES:.vala=.c)			\
-	fep_vala.stamp				\
+	$(ibus_fep_client_SOURCES:.vala=.c)	\
+	ibus_fep_client_vala.stamp		\
 	$(NULL)
 
 EXTRA_DIST = config.vapi ibus-1.0.deps ibus-1.0.vapi ibus-fep.in
 DISTCLEANFILES = ibus-fep
 
-feplibexecdir = $(pkglibexecdir)
-
 bin_SCRIPTS = ibus-fep
 
 ibus-fep: ibus-fep.in
 	$(AM_V_GEN) sed -e "s!@FEP\@!"$(FEP)"!" \
-	-e "s!@CLIENT\@!"$(pkglibexecdir)/fep"!" \
+	-e "s!@CLIENT\@!"$(libexecdir)/ibus-fep-client"!" \
 	$< > $@.tmp && \
 	mv $@.tmp $@
 
