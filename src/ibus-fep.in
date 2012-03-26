@@ -18,4 +18,12 @@
 : ${FEP:=@FEP@}
 : ${CLIENT:=@CLIENT@}
 
+# XXX: handle --help here because the help output from the client will
+# be erased by the terminal reset.
+case "$1" in
+    --help|-h)
+	exec "$CLIENT" --help
+	;;
+esac
+
 exec "$FEP" -- "$CLIENT" "$@"

@@ -36,6 +36,17 @@ static int main (string[] args) {
     Intl.bind_textdomain_codeset (Config.GETTEXT_PACKAGE, "UTF-8");
     Intl.textdomain (Config.GETTEXT_PACKAGE);
 
+    var context = new OptionContext (
+        _("[-- COMMAND...]  - IBus client for text terminals"));
+    context.add_main_entries (entries, "ibus-fep");
+
+    try {
+        context.parse (ref args);
+    } catch (OptionError e) {
+        stderr.printf ("%s\n", e.message);
+        return 1;
+    }
+
     IBus.init ();
     var bus = new IBus.Bus ();
     if (!bus.is_connected ()) {
@@ -44,18 +55,6 @@ static int main (string[] args) {
     }
 
     Options opts = Options () { preedit_style = PreeditStyle.DEFAULT };
-
-    var context = new OptionContext (
-        _("[-- COMMAND...]  - IBus client for text terminals"));
-    context.add_main_entries (entries, "ibus-fep");
-
-    stderr.printf("\n\n"); /* hack to show the first line */
-    try {
-        context.parse (ref args);
-    } catch (OptionError e) {
-        stderr.printf ("%s\n", e.message);
-        return 1;
-    }
 
     if (opt_preedit_style == null) {
         var config = bus.get_config ();
