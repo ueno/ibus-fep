@@ -206,12 +206,21 @@ class Client : Fep.GClient {
                                            uint modifiers)
     {
         if (context != null) {
-            var retval = context.process_key_event (keyval, 0, modifiers);
-            if (retval)
-                update_status ();
-            return retval;
+            context.process_key_event_async.begin (
+                keyval, 0, modifiers,
+                -1, null,
+                (obj, res) => {
+                    var retval = false;
+                    try {
+                        retval = context.process_key_event_async_finish (res);
+                    } catch (GLib.Error e) {
+                    }
+                    if (!retval)
+                        forward_key_event (keyval, modifiers);
+                });
+            update_status ();
         }
-        return false;
+        return true;
     }
 
     bool watch_func (IOChannel source, IOCondition condition) {
