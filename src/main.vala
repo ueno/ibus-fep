@@ -82,12 +82,9 @@ static int main (string[] args) {
 
     // Count opt_remaining.length since it is initially not set by
     // GOptionContext#parse.
-    assert (opt_remaining != null);
-    for (var length = 0; length < args.length; length++)
-        if (opt_remaining[length] == null) {
-            opt_remaining.length = length;
-            break;
-        }
+    if (opt_remaining != null) {
+        opt_remaining.length = (int) GLib.strv_length (opt_remaining);
+    }
 
     string[]? argv;
     if (opt_remaining.length > 0) {
