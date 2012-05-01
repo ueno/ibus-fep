@@ -17,11 +17,13 @@
  */
 
 string? opt_preedit_style = null;
+string[]? opt_remaining = null;
 
 const OptionEntry entries[] = {
     { "preedit-style", 's', 0, OptionArg.STRING,
       out opt_preedit_style,
       "Preedit style (default: over-the-spot)", "[root]" },
+    { "", 0, 0, OptionArg.STRING_ARRAY, out opt_remaining, null, null },
     { null }
 };
 
@@ -78,9 +80,18 @@ static int main (string[] args) {
         opts.preedit_style = (PreeditStyle) evalue.value;
     }
 
+    // Count opt_remaining.length since it is initially not set by
+    // GOptionContext#parse.
+    assert (opt_remaining != null);
+    for (var length = 0; length < args.length; length++)
+        if (opt_remaining[length] == null) {
+            opt_remaining.length = length;
+            break;
+        }
+
     string[]? argv;
-    if (args.length > 1) {
-        argv = args[1 : args.length];
+    if (opt_remaining.length > 0) {
+        argv = opt_remaining;
     } else {
         argv = { Environment.get_variable ("SHELL") };
     }
