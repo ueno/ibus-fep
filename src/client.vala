@@ -202,25 +202,29 @@ class Client : Fep.GClient {
     }
 #endif
 
-    public override bool filter_key_event (uint keyval,
-                                           uint modifiers)
-    {
-        if (context != null) {
-            context.process_key_event_async.begin (
-                keyval, 0, modifiers,
-                -1, null,
-                (obj, res) => {
-                    var retval = false;
-                    try {
-                        retval = context.process_key_event_async_finish (res);
-                    } catch (GLib.Error e) {
-                    }
-                    if (!retval)
-                        forward_key_event (keyval, modifiers);
-                });
-            update_status ();
+    public override bool filter_event (Fep.GEvent e) {
+        switch (e.any.type) {
+        case Fep.GEventType.KEY_PRESS:
+            if (context != null) {
+                context.process_key_event_async.begin (
+                    e.key.keyval, 0, e.key.modifiers,
+                    -1, null,
+                    (obj, res) => {
+                        var retval = false;
+                        try {
+                            retval = context.process_key_event_async_finish (res);
+                        } catch (GLib.Error e) {
+                        }
+                        if (!retval)
+                            send_data (e.key.source, e.key.source_length);
+                    });
+                update_status ();
+            }
+            return true;
+        default:
+            break;
         }
-        return true;
+        return false;
     }
 
     bool watch_func (IOChannel source, IOCondition condition) {

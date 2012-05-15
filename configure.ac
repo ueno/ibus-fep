@@ -63,7 +63,7 @@ PKG_CHECK_MODULES(IBUS_1_5, [ibus-1.0 >= 1.4.99], ibus_1_5=yes, ibus_1_5=no)
 AM_CONDITIONAL([IBUS_1_5], [test x$ibus_1_5 = xyes])
 
 # check libfep
-PKG_CHECK_MODULES(LIBFEP, [libfep-glib >= 0.0.7], ,
+PKG_CHECK_MODULES(LIBFEP, [libfep-glib >= 0.0.9], ,
   AC_MSG_ERROR([can't find libfep]))
 
 AC_PATH_PROG([FEP], [fep])
